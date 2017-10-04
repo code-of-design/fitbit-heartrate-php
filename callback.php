@@ -52,9 +52,28 @@
   );
   $context = stream_context_create($options); // ヘッダと共にHTTPリクエストを$api_urlに対して送信する
   $res = file_get_contents($api_url, false, $context); // レスポンス
-  $heatrate = json_decode($res, true);
 
+  // 心拍数JSON
+  $heartrate_json = $res;
   // 表示する
-  var_dump($heatrate);
+  // echo $heartrate_json;
 
+  // 心拍数JSONを心拍数配列にデコードする
+  $heatrate = json_decode($heartrate_json, true);
+
+  $heatrate_len = count($heatrate["activities-heart-intraday"]["dataset"]);
+  echo $heatrate_len."<br>";
 ?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Fitbit HeartRate PHP7.0</title>
+  </head>
+  <body>
+    <?php
+      echo "Time: ".$heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-1]["time"]."<br>";
+      echo "HeartRate: ".$heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-1]["value"]."<br>";
+    ?>
+  </body>
+</html>
