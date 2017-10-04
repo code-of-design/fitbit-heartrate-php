@@ -5,17 +5,16 @@
   // アクセストークンとユーザIDを取得する
   // POSTヘッダを生成する
   $header = [
-  	'Authorization: Basic ' . base64_encode(CONSUMER_KEY.':'.CONSUMER_SECRET),
+  	'Authorization: Basic ' . base64_encode(CLIENT_ID.':'.CLIENT_SECRET),
   	'Content-Type: application/x-www-form-urlencoded',
   ];
   // POSTパラメータを生成する
   $params = array(
-  	'client_id' => CONSUMER_KEY,
+  	'client_id' => CLIENT_ID,
   	'grant_type' => 'authorization_code',
   	'redirect_uri' => CALLBACK_URL,
   	'code' => $_GET['code'],
   );
-
   // POST送信
   $options = array(
   	'http' => array(

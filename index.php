@@ -1,16 +1,12 @@
 <?php
-	// 環境設定
-  require_once("env.php");
-
-	// URL
-	define('AUTH_URL', 'https://www.fitbit.com/oauth2/authorize');
+  require_once("env.php"); // 環境設定
 
 	// Fitbitの認証ページにリダイレクトする
 	$params = array(
-		'client_id' => CONSUMER_KEY,
+		'client_id' => CLIENT_ID,
 		'redirect_uri' => CALLBACK_URL,
 		'scope' => 'heartrate',
 		'response_type' => 'code',
 	);
-	header("Location: " . AUTH_URL . '?' . http_build_query($params));
+	header("Location: " . AUTH_URL . '?' . http_build_query($params)); // GET送信
 ?>
