@@ -2,13 +2,13 @@
   // 環境設定
   require_once("env.php");
 
-  // POST送信のヘッダー
+  // アクセストークンとユーザIDを取得する
+  // POSTヘッダを生成する
   $header = [
   	'Authorization: Basic ' . base64_encode(CONSUMER_KEY.':'.CONSUMER_SECRET),
   	'Content-Type: application/x-www-form-urlencoded',
   ];
-
-  // アクセストークンの取得
+  // POSTパラメータを生成する
   $params = array(
   	'client_id' => CONSUMER_KEY,
   	'grant_type' => 'authorization_code',
@@ -23,26 +23,25 @@
   		'header' => implode(PHP_EOL,$header),
   		'content' => http_build_query($params),
   		'ignore_errors' => true
-  		)
-  	);
-  $context = stream_context_create($options); // ヘッダと共にHTTPリクエストをTOKEN_URLに対して送信する
-  $res = file_get_contents(TOKEN_URL, false, $context); // レスポンス
-
-  // POST送信のレスポンス取得
-  $token = json_decode($res, true);
-  if(isset($token['error'])){ // エラー処理
+  	)
+  );
+  $context = stream_context_create($options);
+  $response = file_get_contents(TOKEN_URL, false, $context);
+  $token = json_decode($response, true); // アクセストークン
+  // エラー処理
+  if(isset($token['error'])){
   	echo 'ERROR!!!';
   	exit;
   }
-  // レスポンスからアクセストークンとユーザIDを取得する
   $access_token = $token['access_token']; // アクセストークン
   $user_id = $token['user_id']; // ユーザID
 
-  // １日の心拍数を取得する（activities/heart）
-  $params = array('access_token' => $access_token); // アクセストークン
+  // 心拍数を取得する
   // $api_url = 'https://api.fitbit.com/1/user/' . $user_id . '/activities/heart/date/today/1d.json'; // Get Heart Rate Time Series
   $api_url = 'https://api.fitbit.com/1/user/-/activities/heart/date/today/1d/1sec.json'; // Get Heart Rate Intraday Time Series
+  // GETヘッダを生成する
   $header = 'Authorization: Bearer ' . $access_token;
+  // $params = array('access_token' => $access_token); // アクセストークン
   $options = array(
   	'http' => array(
   		'method' => 'GET',
@@ -50,30 +49,32 @@
   		'ignore_errors' => true
   	)
   );
-  $context = stream_context_create($options); // ヘッダと共にHTTPリクエストを$api_urlに対して送信する
-  $res = file_get_contents($api_url, false, $context); // レスポンス
-
-  // 心拍数JSON
-  $heartrate_json = $res;
-  // 表示する
-  // echo $heartrate_json;
-
+  $context = stream_context_create($options); // HTTPリクエストを$api_urlに対して送信する
+  $response = file_get_contents($api_url, false, $context); // レスポンス
+  // GETのレスポンスを取得する
+  $heartrate_json = $response; // 心拍数JSON
+  // echo $heartrate_json; // 表示する
   // 心拍数JSONを心拍数配列にデコードする
   $heatrate = json_decode($heartrate_json, true);
-
-  $heatrate_len = count($heatrate["activities-heart-intraday"]["dataset"]);
-  echo $heatrate_len."<br>";
+  $heatrate_len = count($heatrate["activities-heart-intraday"]["dataset"]); // 1日の心拍数のログサイズ
 ?>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
     <title>Fitbit HeartRate PHP7.0</title>
+    <style>
+      p{
+        font-size: 48px;
+        margin: 20px;
+      }
+    </style>
   </head>
   <body>
+    <p>最新の心拍数</p>
     <?php
-      echo "Time: ".$heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-1]["time"]."<br>";
-      echo "HeartRate: ".$heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-1]["value"]."<br>";
+      echo "<p>Time: ".$heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-1]["time"]."</p>";
+      echo "<p>HeartRate: ".$heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-1]["value"]."</p>";
     ?>
   </body>
 </html>
