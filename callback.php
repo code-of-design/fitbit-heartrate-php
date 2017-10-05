@@ -44,21 +44,18 @@
   </head>
   <body>
     <p>Fitbit API by PHP7.0 [ <a href="https://github.com/code-of-design/fitbit-heartrate-php">https://github.com/code-of-design/fitbit-heartrate-php</a> ]</p>
-    <!-- 心拍数 -->
-    <?php
-      for ($i=1; $i <= 15; $i++) {
-        echo "<span>Time: " . $heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-$i]["time"] . "</span>";
-        echo "<span> HeartRate: ". $heatrate["activities-heart-intraday"]["dataset"][$heatrate_len-$i]["value"] ."</span><br>";
-      }
-    ?>
+    <p>Time:<span class="time"></span></p>
+    <p>HeartRate:<span class="heartrate"></span></p>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
       function getHeartrate(){
         $.post("heartrate.php", {"token": "<?php echo $access_token; ?>"},function(data){
           console.log(data);
+          // var d = $.parseJSON(data);
+          // console.log(d);
         });
       }
-      setInterval("getHeartrate()", 1000);
+      setInterval("getHeartrate()", 3000);
     </script>
   </body>
 </html>
