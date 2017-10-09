@@ -1,6 +1,5 @@
 <?php
-  require_once("env.php"); // 環境設定
-  // require_once("heartrate.php"); // 心拍数
+  require_once("env.php"); // 環境設定ファイルの読み込み
 
   // アクセストークンを取得する
   // POSTヘッダを生成する
@@ -43,19 +42,26 @@
     <title>Fitbit HeartRate PHP7.0</title>
   </head>
   <body>
-    <p>Fitbit API by PHP7.0 [ <a href="https://github.com/code-of-design/fitbit-heartrate-php">https://github.com/code-of-design/fitbit-heartrate-php</a> ]</p>
-    <p>Time:<span class="time"></span></p>
-    <p>HeartRate:<span class="heartrate"></span></p>
+    <p>Fitbit Web API by PHP7 [ <a href="https://github.com/code-of-design/fitbit-heartrate-php">https://github.com/code-of-design/fitbit-heartrate-php</a> ]</p>
+    <p>Time: <span class="time"></span></p>
+    <p>HeartRate: <span class="heartrate"></span> bpm</p>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
+      // 心拍数を取得する
+      getHeartrate();
+
+      // 毎分ごとに心拍数をリクエストする
+      // setInterval("getHeartrate()", 60000);
+
       function getHeartrate(){
-        $.post("heartrate.php", {"token": "<?php echo $access_token; ?>"},function(data){
-          console.log(data);
-          // var d = $.parseJSON(data);
-          // console.log(d);
+        $.post("heartrate.php", {"token": "<?php echo $access_token; ?>"},function(data){ // アクセストークンをPOSTする
+          var d = $.parseJSON(data);
+          $(".time").text(d[0].time); // 時間を表示する
+          $(".heartrate").text(d[0].heartrate); // 心拍数を表示する
+          console.log(d);
         });
       }
-      setInterval("getHeartrate()", 3000);
+
     </script>
   </body>
 </html>
